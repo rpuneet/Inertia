@@ -1,3 +1,5 @@
+import os
+
 LANGUAGES = {
     'python3': {
         'name': 'Python 3',
@@ -12,4 +14,5 @@ LANGUAGES = {
         'extension': 'cpp'
     },
 }
-MAIN_FILE_NAME = 'main'
+MAIN_FILE_NAME = 'Solution'
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))

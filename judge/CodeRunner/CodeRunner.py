@@ -19,7 +19,7 @@ class CodeRunner:
         self.dockerClient = docker.from_env()
         self.tag = '-'.join((self.language , str(int(time.time()))))
 
-    def intializeDockerContainer(self):
+    def initializeDockerContainer(self):
         '''
         Initialize the docker image and container.
         @return bool - If initialization was successful or not.

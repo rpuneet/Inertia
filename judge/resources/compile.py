@@ -51,7 +51,7 @@ class Compile(Resource):
             return compilationOutput
         
         #Initialize docker container
-        initializationSuccessful = compiler.intializeDockerContainer()
+        initializationSuccessful = compiler.initializeDockerContainer()
         if not initializationSuccessful:
             compilationOutput['exitCode'] = 500
             compilationOutput['stderr'] = 'Internal server error'

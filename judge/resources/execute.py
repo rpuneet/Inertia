@@ -52,7 +52,7 @@ class Execute(Resource):
             return compilationOutput
         
         #Initialize docker container
-        initializationSuccessful = executer.intializeDockerContainer()
+        initializationSuccessful = executer.initializeDockerContainer()
         if not initializationSuccessful:
             compilationOutput['exitCode'] = 500
             compilationOutput['stderr'] = 'Internal server error'

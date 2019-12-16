@@ -1,0 +1,1 @@
+./Solution < ./src/input.txt

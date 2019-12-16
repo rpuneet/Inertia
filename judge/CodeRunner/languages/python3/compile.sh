@@ -1,1 +1,1 @@
-python -m py_compile Solution.py
+python -m py_compile ./src/Solution.py

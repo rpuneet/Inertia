@@ -1,4 +1,4 @@
-FROM python:3.8.0
+FROM openjdk:13
 
 RUN mkdir -p judge
 COPY . /judge

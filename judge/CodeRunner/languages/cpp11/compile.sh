@@ -1,1 +1,1 @@
-g++ -std=c++11 Solution.cpp
+g++ -std=c++11 ./src/Solution.cpp -o Solution

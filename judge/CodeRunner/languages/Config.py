@@ -1,6 +1,6 @@
 import os
 
-__all__ = ['LANGUAGES' , 'CONTAINER_VOLUME_DIR_NAME' , 'MAIN_FILE_NAME' , 'BASE_DIR']
+__all__ = ['LANGUAGES' , 'CONTAINER_VOLUME_DIR_NAME' , 'MAIN_FILE_NAME' , 'BASE_DIR' , 'INPUT_FILE_NAME']
 
 LANGUAGES = {
     'python3': {

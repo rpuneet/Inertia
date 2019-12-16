@@ -5,13 +5,20 @@ from languages.Config import INPUT_FILE_NAME
 import time
 
 class Executer(Compiler):
-    ''' Executer class is used to execute the given code with the given output '''
+    '''
+    Executer class is used to execute the given code with the given output 
+    '''
     def __init__(self , language):
         super().__init__(language)
     
     def execute(self , input='' , timeout=2):
         '''
         Execute the given code which has been compiled.
+
+        @param string input - The input for the compiled code.
+        @param int timeout - Time limit for the execution process.
+        @return dict - returns the exitCode , stdout , stderr , 
+                        warnings and timeTaken for the execution.
         '''
         if not self.compilationSuccessful:
             return {
@@ -23,6 +30,7 @@ class Executer(Compiler):
         self.__saveInputToVolume(input)
 
         executeCommand = ['timeout' , str(timeout) , 'sh' , 'execute.sh' , '-k']
+
         startTime = time.time()
         exitCode , output = self.dockerContainer.exec_run(
             executeCommand,
@@ -31,6 +39,7 @@ class Executer(Compiler):
             demux=True
         )
         endTime = time.time()
+        
         stdout , stderr = output
         if stderr:
             stderr = stderr.decode()

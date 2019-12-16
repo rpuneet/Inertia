@@ -5,7 +5,7 @@ import os
 
 class Compiler(CodeRunner):
     '''
-    Compiler class is used to compile the code.
+    Compiler class is used to compile the code. It is the base class for Executer.
     '''
     def __init__(self , language):
         super().__init__(language)
@@ -14,7 +14,10 @@ class Compiler(CodeRunner):
 
     def compile(self , code , timeout=5):
         '''
-        Compiles the code and returns the exitCode, errorMessage and warnings.
+        Compiles the given code.
+        @param string code - The code to compile.
+        @param int timeout - time limit for the compilation process.
+        @return dict - returns the exitCode, stderr and warnings.
         '''
         self.compilationSuccessful = False
         self.__saveCodeToVolume(code)
@@ -36,10 +39,11 @@ class Compiler(CodeRunner):
             stderr = ''
         # Check for time out
         if exitCode == 124:
-            stderr = 'Compilation timeout'
+            stderr = 'Compilation timed out'
         
         if exitCode == 0:
             self.compilationSuccessful = True
+
         return {
             'exitCode': exitCode,
             'stderr': stderr,
@@ -52,6 +56,7 @@ class Compiler(CodeRunner):
 
         with open(filePath , 'w') as codeFile:
             codeFile.write(code)
+            
     def __deleteCodeFromVolume(self):
         fileName = '.'.join((MAIN_FILE_NAME , LANGUAGES[self.language]['extension']))
         filePath = os.path.join(self.dockerVolumePath , fileName)

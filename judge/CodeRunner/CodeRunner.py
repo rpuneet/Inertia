@@ -8,7 +8,7 @@ __all__ = ['CodeRunner' , 'LanguageNotSupportedError']
 
 class CodeRunner:
     '''
-    CodeRunner is the base class for initializing a Docker container for compiling and executing.
+    CodeRunner is the base class used for initializing a Docker container for compiling and executing.
     '''
     def __init__(self , language):
         if language not in LANGUAGES:
@@ -20,6 +20,10 @@ class CodeRunner:
         self.tag = '-'.join((self.language , str(int(time.time()))))
 
     def intializeDockerContainer(self):
+        '''
+        Initialize the docker image and container.
+        @return bool - If initialization was successful or not.
+        '''
         buildSuccessful , dockerImage = self.__buildImage()
         if not buildSuccessful:
             return False
@@ -32,7 +36,8 @@ class CodeRunner:
         
     def __buildImage(self):
         '''
-        Builds an image from the dockerfile mentioned.
+        Builds an image from the dockerfile according to the language.
+        if image already exists, returns the image.
         @return (success , image) - 
                         success bool - True if build was successful.
                         image - docker.Image object
@@ -53,12 +58,13 @@ class CodeRunner:
             )
             return (True , image)
         except docker.errors.BuildError as err:
-            print(err)
             return (False , None)
 
     def __runContainer(self , image):
         '''
         Run the given docker image in a container in detatch mode with tty True.
+        Attaches the directory src in the language directory.
+        if container already exists, returns the container.
         @return (success , container) - 
                         success bool - True if run was successful.
                         container - docker.Container object
@@ -67,6 +73,7 @@ class CodeRunner:
         for container in self.dockerClient.containers.list():
             if self.language in container.name:
                 return (True , container)
+
         try:
             container = self.dockerClient.containers.run(
                 image=image,
@@ -83,13 +90,12 @@ class CodeRunner:
             )
             return (True , container)
         except docker.errors.ContainerError as err:
-            print(err)
             return (False , None)
 
 
 class CodeRunnerError(Exception):
     '''
-    Base class for compiler exceptions.
+    Base class for CodeRunner exceptions.
     '''
     def __init__(self , errorMessage):
         Exception.__init__(self , errorMessage)

@@ -1,6 +1,6 @@
 import os
-from Compiler import Compiler
-from languages.Config import INPUT_FILE_NAME
+from CodeRunner.Compiler import Compiler
+from CodeRunner.languages.Config import INPUT_FILE_NAME
 
 import time
 

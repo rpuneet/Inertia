@@ -1,5 +1,5 @@
 import os
-from languages.Config import *
+from CodeRunner.languages.Config import *
 
 import docker
 import time

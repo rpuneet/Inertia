@@ -1,5 +1,5 @@
-from CodeRunner import CodeRunner
-from languages.Config import *
+from CodeRunner.CodeRunner import CodeRunner
+from CodeRunner.languages.Config import *
 
 import os
 
@@ -53,7 +53,6 @@ class Compiler(CodeRunner):
     def __saveCodeToVolume(self , code):
         fileName = '.'.join((MAIN_FILE_NAME , LANGUAGES[self.language]['extension']))
         filePath = os.path.join(self.dockerVolumePath , fileName)
-
         with open(filePath , 'w') as codeFile:
             codeFile.write(code)
             

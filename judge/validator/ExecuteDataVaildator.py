@@ -1,8 +1,8 @@
-class CompileDataVaildator:
+class ExecuteDataVaildator:
     '''
-    Class to validate compile data.
+    Class to validate execute data.
     '''
-    def validateCompileData(self , data):
+    def validateExecuteData(self , data):
         '''
         This function validates the data and returns isValid and errors.
 
@@ -10,6 +10,8 @@ class CompileDataVaildator:
         code - validate if code is present and not empty.
         timeout - Timeout for the compilation process.
                   default 2
+        input   - input for the code.
+                  default empty string 
         @return (isValid , errors) tuple - Returns a tuple containing isValid and errors
                 isValid bool - True if the given data is valid and can be compiled
                 errors dict - A dictionary containing all the errors
@@ -46,6 +48,10 @@ class CompileDataVaildator:
             else:
                 data['timeout'] = int(data['timeout'])
 
+        #Validate input
+        if 'input' not in data:
+            data['input'] = ''
+        
         return (isValid , errors)
 
         

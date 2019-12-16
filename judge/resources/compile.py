@@ -1,10 +1,9 @@
 from flask_restful import Resource
 from flask import request
 
-from src.compiler import Compiler , LanguageNotSupportedError
-
 from validator.CompileDataValidator import CompileDataVaildator
-
+from CodeRunner.Compiler import Compiler
+from CodeRunner.CodeRunner import LanguageNotSupportedError
 from config import version
 
 class Compile(Resource):
@@ -24,7 +23,7 @@ class Compile(Resource):
         '''
         @desc compile the given code in the specified language
         @access public
-        @return exitCode, errorMessage and warningMessage (if any)
+        @return exitCode, stderr and warnings
         '''
         compileData = request.get_json()
 
@@ -36,29 +35,30 @@ class Compile(Resource):
         #Initialize output
         compilationOutput = {
             'exitCode': 0,
-            'errorMessage': ''
+            'stderr': ''
         }
+
         # Initialize compiler
         try:
-            compiler = Compiler(compileData['language'] , compileData['timeout'])
+            compiler = Compiler(compileData['language'])
         except LanguageNotSupportedError:
             compilationOutput['exitCode'] = 404
-            compilationOutput['errorMessage'] = 'The language is not supported'
+            compilationOutput['stderr'] = 'Language not found'
             return compilationOutput
         except:
             compilationOutput['exitCode'] = 500
-            compilationOutput['errorMessage'] = 'Internal server error'
+            compilationOutput['stderr'] = 'Internal server error'
             return compilationOutput
         
         #Initialize docker container
-        initializationSuccessful = compiler.intializeDockerContainer(compileData['code'])
+        initializationSuccessful = compiler.intializeDockerContainer()
         if not initializationSuccessful:
             compilationOutput['exitCode'] = 500
-            compilationOutput['errorMessage'] = 'Internal server error'
+            compilationOutput['stderr'] = 'Internal server error'
             return compilationOutput
         
         #Compile the code
-        compilationOutput = compiler.compile()
+        compilationOutput = compiler.compile(compileData['code'])
 
         return compilationOutput
 

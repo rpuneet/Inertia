@@ -2,6 +2,8 @@ import os
 from Compiler import Compiler
 from languages.Config import INPUT_FILE_NAME
 
+import time
+
 class Executer(Compiler):
     ''' Executer class is used to execute the given code with the given output '''
     def __init__(self , language):
@@ -21,12 +23,14 @@ class Executer(Compiler):
         self.__saveInputToVolume(input)
 
         executeCommand = ['timeout' , str(timeout) , 'sh' , 'execute.sh' , '-k']
+        startTime = time.time()
         exitCode , output = self.dockerContainer.exec_run(
             executeCommand,
             stdout=True,
             stderr=True,
             demux=True
         )
+        endTime = time.time()
         stdout , stderr = output
         if stderr:
             stderr = stderr.decode()
@@ -45,7 +49,8 @@ class Executer(Compiler):
             'exitCode': exitCode,
             'stdout': stdout,
             'stderr': stderr,
-            'warnings': warnings
+            'warnings': warnings,
+            'timeTaken': endTime - startTime
         }
 
     def __saveInputToVolume(self , input):
@@ -61,3 +66,4 @@ class Executer(Compiler):
     def __del__(self):
         if self.compilationSuccessful:
             self.__deleteInputFromVolume()
+        super().__del__()

@@ -1,6 +1,6 @@
 from CodeRunner.CodeRunner import CodeRunner
 from CodeRunner.languages.Config import *
-
+from CodeRunner.TarDataGenerator import TarDataGenerator
 import os
 
 class Compiler(CodeRunner):
@@ -10,7 +10,7 @@ class Compiler(CodeRunner):
     def __init__(self , language):
         super().__init__(language)
         self.compilationSuccessful = False
-        self.dockerVolumePath = os.path.join(self.dockerfilePath , CONTAINER_VOLUME_DIR_NAME)
+        # self.dockerVolumePath = os.path.join(self.dockerfilePath , CONTAINER_VOLUME_DIR_NAME)
 
     def compile(self , code , timeout=5):
         '''
@@ -20,7 +20,8 @@ class Compiler(CodeRunner):
         @return dict - returns the exitCode, stderr and warnings.
         '''
         self.compilationSuccessful = False
-        self.__saveCodeToVolume(code)
+        
+        self.__addCodeToContainer(code)
 
         compilationCommand = ['timeout' , str(timeout) , 'sh' , 'compile.sh' , '-k']
         exitCode , output = self.dockerContainer.exec_run(
@@ -29,6 +30,7 @@ class Compiler(CodeRunner):
             stderr=True,
             demux=True
         )
+
         stdout , stderr = output
         if stderr:
             stderr = stderr.decode()
@@ -37,6 +39,7 @@ class Compiler(CodeRunner):
         if exitCode == 0 and stderr:
             warnings = stderr
             stderr = ''
+
         # Check for time out
         if exitCode == 124:
             stderr = 'Compilation timed out'
@@ -50,16 +53,12 @@ class Compiler(CodeRunner):
             'warnings': warnings
         }
 
-    def __saveCodeToVolume(self , code):
+    def __addCodeToContainer(self , code):
         fileName = '.'.join((MAIN_FILE_NAME , LANGUAGES[self.language]['extension']))
-        filePath = os.path.join(self.dockerVolumePath , fileName)
-        with open(filePath , 'w') as codeFile:
-            codeFile.write(code)
+        self.dockerContainer.put_archive(
+            SRC_CONTAINER_PATH , 
+            TarDataGenerator((fileName , code)).getBytes()
+            )
             
-    def __deleteCodeFromVolume(self):
-        fileName = '.'.join((MAIN_FILE_NAME , LANGUAGES[self.language]['extension']))
-        filePath = os.path.join(self.dockerVolumePath , fileName)
-        os.remove(filePath)
-
     def __del__(self):
-        self.__deleteCodeFromVolume()
+        super().__del__()

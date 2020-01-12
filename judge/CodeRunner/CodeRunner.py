@@ -3,7 +3,7 @@ from CodeRunner.languages.Config import *
 
 import docker
 import time
-
+from random import randint
 __all__ = ['CodeRunner' , 'LanguageNotSupportedError']
 
 class CodeRunner:
@@ -24,14 +24,14 @@ class CodeRunner:
         Initialize the docker image and container.
         @return bool - If initialization was successful or not.
         '''
-        buildSuccessful , dockerImage = self.__buildImage()
+        buildSuccessful , self.dockerImage = self.__buildImage()
         if not buildSuccessful:
             return False
 
-        runSuccessful , self.dockerContainer = self.__runContainer(dockerImage)
+        runSuccessful , self.dockerContainer = self.__runContainer(self.dockerImage)
         if not runSuccessful:
             return False
-
+        
         return True
         
     def __buildImage(self):
@@ -69,10 +69,6 @@ class CodeRunner:
                         success bool - True if run was successful.
                         container - docker.Container object
         '''
-        # Check if container is already running.
-        for container in self.dockerClient.containers.list():
-            if self.language in container.name:
-                return (True , container)
 
         try:
             container = self.dockerClient.containers.run(
@@ -81,16 +77,14 @@ class CodeRunner:
                 tty=True,
                 name=self.tag,
                 auto_remove=True,
-                volumes={
-                    os.path.join(self.dockerfilePath , CONTAINER_VOLUME_DIR_NAME) : {
-                        'bind': os.path.join('/' , 'judge' , CONTAINER_VOLUME_DIR_NAME),
-                        'mode': 'rw'
-                    }
-                }
             )
             return (True , container)
         except docker.errors.ContainerError as err:
             return (False , None)
+    def __del__(self):
+        self.dockerContainer.remove(force=True)
+        # self.dockerClient.images.remove(self.dockerImage.id)
+        
 
 
 class CodeRunnerError(Exception):

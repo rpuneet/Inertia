@@ -1,6 +1,7 @@
 import os
 from CodeRunner.Compiler import Compiler
-from CodeRunner.languages.Config import INPUT_FILE_NAME
+from CodeRunner.languages.Config import *
+from CodeRunner.TarDataGenerator import TarDataGenerator
 
 import time
 
@@ -11,11 +12,11 @@ class Executer(Compiler):
     def __init__(self , language):
         super().__init__(language)
     
-    def execute(self , input='' , timeout=2):
+    def execute(self , inputData='' , timeout=2):
         '''
         Execute the given code which has been compiled.
 
-        @param string input - The input for the compiled code.
+        @param string inputData - The inputData for the compiled code.
         @param int timeout - Time limit for the execution process.
         @return dict - returns the exitCode , stdout , stderr , 
                         warnings and timeTaken for the execution.
@@ -27,7 +28,7 @@ class Executer(Compiler):
                 'stderr': 'Nothing to execute. Compile the code first.'
             }
         
-        self.__saveInputToVolume(input)
+        self.__addInputToContainer(inputData)
 
         executeCommand = ['timeout' , str(timeout) , 'sh' , 'execute.sh' , '-k']
 
@@ -62,17 +63,11 @@ class Executer(Compiler):
             'timeTaken': endTime - startTime
         }
 
-    def __saveInputToVolume(self , input):
-        filePath = os.path.join(self.dockerVolumePath , INPUT_FILE_NAME)
-
-        with open(filePath , 'w') as inputFile:
-            inputFile.write(input)
-
-    def __deleteInputFromVolume(self):
-        filePath = os.path.join(self.dockerVolumePath , INPUT_FILE_NAME)
-        os.remove(filePath)
+    def __addInputToContainer(self , inputData):
+        self.dockerContainer.put_archive(
+            SRC_CONTAINER_PATH , 
+            TarDataGenerator((INPUT_FILE_NAME , inputData)).getBytes()
+            )
 
     def __del__(self):
-        if self.compilationSuccessful:
-            self.__deleteInputFromVolume()
         super().__del__()

@@ -1,6 +1,6 @@
 import os
 
-__all__ = ['LANGUAGES' , 'CONTAINER_VOLUME_DIR_NAME' , 'MAIN_FILE_NAME' , 'BASE_DIR' , 'INPUT_FILE_NAME']
+__all__ = ['LANGUAGES' , 'SRC_CONTAINER_PATH' , 'MAIN_FILE_NAME' , 'BASE_DIR' , 'INPUT_FILE_NAME']
 
 LANGUAGES = {
     'python3': {
@@ -23,6 +23,6 @@ LANGUAGES = {
     }
 }
 INPUT_FILE_NAME = 'input.txt'
-CONTAINER_VOLUME_DIR_NAME = 'src'
+SRC_CONTAINER_PATH = '/judge/src'
 MAIN_FILE_NAME = 'Solution'
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
